@@ -1,0 +1,190 @@
+linters:
+  enable-all: true
+
+linters-settings:
+  revive:
+    rules:
+      - name: var-declaration
+      - name: increment-decrement
+      - name: package-comments
+      - name: error-return
+      - name: import-shadowing
+      - name: range-val-in-closure
+      - name: call-to-gc
+      - name: function-result-limit
+        arguments: [ 1 ]
+      - name: file-header
+        arguments: [ "foo" ]
+      - name: string-format
+      - name: superfluous-else
+      - name: waitgroup-by-value
+      - name: defer
+      - name: function-length
+        arguments: [ 1, 2 ]
+      - name: duplicated-imports
+      - name: argument-limit
+        arguments: [ 1 ]
+      - name: receiver-naming
+      - name: indent-error-flow
+      - name: deep-exit
+      - name: max-public-structs
+        arguments: [ 1 ]
+      - name: get-return
+      - name: cognitive-complexity
+        arguments: [ 2 ]
+      - name: bool-literal-in-expr
+      - name: optimize-operands-order
+      - name: redefines-builtin-id
+      - name: unconditional-recursion
+      - name: imports-blacklist
+      - name: dot-imports
+      - name: identical-branches
+      - name: flag-parameter
+      - name: struct-tag
+      - name: modifies-value-receiver
+      - name: confusing-results
+      - name: empty-block
+      - name: unused-parameter
+      - name: datarace
+      - name: context-as-argument
+      - name: add-constant
+      - name: blank-imports
+      - name: unreachable-code
+      - name: useless-break
+      - name: if-return
+      - name: atomic
+      - name: var-naming
+      - name: exported
+      - name: unexported-naming
+      - name: time-naming
+      - name: banned-characters
+        arguments: [ "*" ]
+      - name: unnecessary-stmt
+      - name: early-return
+      - name: unused-receiver
+      - name: time-equal
+      - name: bare-return
+      - name: nested-structs
+      - name: line-length-limit
+        arguments: [ 1 ]
+      - name: modifies-parameter
+      - name: unexported-return
+      - name: confusing-naming
+      - name: unhandled-error
+      - name: context-keys-type
+      - name: cyclomatic
+        arguments: [ 1 ]
+      - name: string-of-int
+      - name: error-naming
+      - name: empty-lines
+      - name: constant-logical-expr
+
+
+  gocritic:
+    enabled-checks:
+      - appendassign
+      - appendcombine
+      - argorder
+      - assignop
+      - badcall
+      - badcond
+      - badlock
+      - badregexp
+      - badsorting
+      - boolexprsimplify
+      - builtinshadow
+      - builtinshadowdecl
+      - captlocal
+      - caseorder
+      - codegencomment
+      - commentedoutcode
+      - commentedoutimport
+      - commentformatting
+      - defaultcaseorder
+      - deferinloop
+      - deferunlambda
+      - deprecatedcomment
+      - docstub
+      - duparg
+      - dupbranchbody
+      - dupcase
+      - dupimport
+      - dupsubexpr
+      - dynamicfmtstring
+      - elseif
+      - emptydecl
+      - emptyfallthrough
+      - emptystringtest
+      - equalfold
+      - evalorder
+      - exitafterdefer
+      - exposedsyncmutex
+      - externalerrorreassign
+      - filepathjoin
+      - flagderef
+      - flagname
+      - hexliteral
+      - httpnobody
+      - hugeparam
+      - ifelsechain
+      - importshadow
+      - indexalloc
+      - initclause
+      - ioutildeprecated
+      - mapkey
+      - methodexprcall
+      - nestingreduce
+      - newderef
+      - nilvalreturn
+      - octalliteral
+      - offby1
+      - paramtypecombine
+      - preferdecoderune
+      - preferfilepathjoin
+      - preferfprint
+      - preferstringwriter
+      - preferwritebyte
+      - ptrtorefparam
+      - rangeexprcopy
+      - rangevalcopy
+      - redundantsprint
+      - regexpmust
+      - regexppattern
+      - regexpsimplify
+      - returnafterhttperror
+      - ruleguard
+      - singlecaseswitch
+      - sliceclear
+      - sloppylen
+      - sloppyreassign
+      - sloppytypeassert
+      - sortslice
+      - sprintfquotedstring
+      - sqlquery
+      - stringconcatsimplify
+      - stringscompare
+      - stringxbytes
+      - switchtrue
+      - syncmaploadanddelete
+      - timecmpsimplify
+      - timeexprsimplify
+      - todocommentwithoutdetail
+      - toomanyresultschecker
+      - truncatecmp
+      - typeassertchain
+      - typedeffirst
+      - typeswitchvar
+      - typeunparen
+      - underef
+      - unlabelstmt
+      - unlambda
+      - unnamedresult
+      - unnecessaryblock
+      - unnecessarydefer
+      - unslice
+      - valswap
+      - weakcond
+      - whynolint
+      - wrapperfunc
+      - yodastyleexpr
+
