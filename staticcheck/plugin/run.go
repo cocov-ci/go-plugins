@@ -2,12 +2,13 @@ package plugin
 
 import (
 	"encoding/json"
-	"github.com/cocov-ci/go-plugin-kit/cocov"
-	"github.com/cocov-ci/go-plugins/common"
-	"go.uber.org/zap"
 	"log"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/cocov-ci/go-plugin-kit/cocov"
+	"github.com/cocov-ci/go-plugins/common"
+	"go.uber.org/zap"
 )
 
 func Run(ctx cocov.Context) error {
@@ -64,7 +65,7 @@ func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
 }
 
 func parseChecks(stdOut []byte) ([]*common.CocovIssue, error) {
-	var issues []*common.CocovIssue
+	var issues []*common.CocovIssue //nolint:prealloc
 	var buff []byte
 	for _, b := range stdOut {
 		if b != '\n' {
