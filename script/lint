@@ -31,6 +31,7 @@ modules=(
   "common"
   "golangci-lint"
   "revive"
+  "staticcheck"
 )
 
 for plugin in "${modules[@]}"; do
