@@ -69,9 +69,9 @@ func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
 
 		if err != nil {
 			logger.Error("Error running revive",
-				zap.String("at path", modDir),
-				zap.String("StdOut: ", string(stdOut)),
-				zap.String("StdErr: ", string(stdErr)),
+				zap.String("module path", modDir),
+				zap.String("stdOut: ", string(stdOut)),
+				zap.String("stdErr: ", string(stdErr)),
 				zap.String("error:", err.Error()),
 			)
 			return nil, err
@@ -79,7 +79,7 @@ func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
 
 		var modRules []rule
 		if err := json.Unmarshal(stdOut, &modRules); err != nil {
-			logger.Error("Error unmarshalling  revive output",
+			logger.Error("Error unmarshalling revive output",
 				zap.String("output: ", string(stdOut)),
 				zap.Error(err))
 			return nil, err
