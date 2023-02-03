@@ -2,13 +2,14 @@ package plugin
 
 import (
 	"fmt"
+	"os"
+	"testing"
+
 	"github.com/cocov-ci/go-plugins/common"
 	sdkmocks "github.com/cocov-ci/go-plugins/common/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
-	"os"
-	"testing"
 )
 
 func TestRun(t *testing.T) {
