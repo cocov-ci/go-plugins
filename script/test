@@ -4,6 +4,7 @@ set -e
 plugins=(
   "golangci-lint"
   "revive"
+  "staticcheck"
 )
 
 if [[ "$1" == "--cover" ]]; then
