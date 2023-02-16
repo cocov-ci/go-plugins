@@ -2,7 +2,6 @@ FROM golang:alpine AS builder
 
 ARG go_token
 
-#RUN apt update && apt install git openssl
 RUN apk --no-cache add git openssl
 RUN git config --global url."https://oauth2:$go_token@github.com/".insteadOf "https://github.com/"
 
@@ -11,8 +10,10 @@ ENV CGO_ENABLED=0
 
 RUN mkdir /app
 WORKDIR /app
-COPY . .
-RUN go build cmd/main.go
+COPY golangci-lint golangci-lint
+COPY common common
+WORKDIR /app/golangci-lint
+RUN go build -o ../main ./cmd/main.go
 
 FROM golang:alpine
 
