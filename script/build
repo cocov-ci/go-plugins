@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+projects=(golangci-lint revive staticcheck)
+for i in "${projects[@]}"; do
+ docker build -f "${i}/Dockerfile" -t "cocov/${i}:$(cat "${i}/VERSION" | head -n 1)" $@ .
+done
+
+for i in "${projects[@]}"; do
+  docker push "cocov/${i}:$(cat "${i}/VERSION" | head -n 1)"
+done
