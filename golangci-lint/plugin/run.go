@@ -112,5 +112,5 @@ func buildCocovIssues(path string, out *goCILintOutput) []*common.CocovIssue {
 
 func isGolangCILintExpectedErr(err error) bool {
 	extErr, ok := err.(*exec.ExitError)
-	return ok || extErr.ExitCode() != 1
+	return ok && extErr.ExitCode() == 1
 }
