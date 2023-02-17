@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"os/exec"
 	"path/filepath"
@@ -52,6 +51,10 @@ func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
 			return nil, err
 		}
 
+		if output == nil {
+			continue
+		}
+
 		modIssues := buildCocovIssues(modDir, output)
 		repoIssues = append(repoIssues, modIssues...)
 	}
@@ -69,10 +72,10 @@ func runGolangCILint(path string, log *zap.Logger) (*goCILintOutput, error) {
 				zap.String("Std error: ", string(stdErr)))
 			return nil, err
 		}
+	}
 
-	} else if len(stdOut) == 0 {
-		log.Error("Std out is empty", zap.String("Std error:", string(stdErr)))
-		return nil, fmt.Errorf("std error :%s", string(stdErr))
+	if len(stdOut) < 2 {
+		return nil, nil
 	}
 
 	out := &goCILintOutput{}
@@ -81,6 +84,10 @@ func runGolangCILint(path string, log *zap.Logger) (*goCILintOutput, error) {
 			zap.Error(err),
 			zap.String("output:", string(stdOut)))
 		return nil, err
+	}
+
+	if len(out.Issues) == 0 {
+		return nil, nil
 	}
 
 	return out, nil
