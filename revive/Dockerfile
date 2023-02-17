@@ -32,7 +32,8 @@ RUN addgroup -g 1000 cocov && \
     adduser --shell /bin/ash --disabled-password \
    --uid 1000 --ingroup cocov cocov
 
+RUN chown -R cocov:cocov /go
+
 USER cocov
 
 CMD ["plugin-revive"]
-
