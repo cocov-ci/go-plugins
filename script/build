@@ -10,3 +10,4 @@ done
 for i in "${projects[@]}"; do
   docker push "cocov/${i}:$(cat "${i}/VERSION" | head -n 1)"
 done
+
