@@ -3,7 +3,7 @@ module github.com/cocov-ci/go-plugins/staticcheck
 go 1.19
 
 require (
-	github.com/cocov-ci/go-plugin-kit v0.1.11
+	github.com/cocov-ci/go-plugin-kit v0.1.12
 	github.com/cocov-ci/go-plugins/common v0.0.0-20230109083926-1f205d5c5b17
 	github.com/golang/mock v1.6.0
 	github.com/stretchr/testify v1.8.1
