@@ -7,6 +7,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      COCOV_REPOSITORY_TOKEN: ${{ secrets.COCOV_REPOSITORY_TOKEN }}
+      COCOV_API_URL: ${{ secrets.COCOV_API_URL }}
+
     steps:
       - name: Set up Go 1.19
         uses: actions/setup-go@v2
@@ -26,11 +30,20 @@ jobs:
         run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
       - name: Check out to repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Prepare coverage-reporter
+        run: |
+          curl -sSL https://vito.io/private/coverage-reporter > .coverage-reporter
+          chmod +x .coverage-reporter
+          ./.coverage-reporter prepare
 
       - name: Run tests
-        run: | 
+        run: |
           script/test
+
+      - name: Push coverage report
+        run: ./.coverage-reporter submit
 
   build:
     if: github.ref == 'refs/heads/master'
