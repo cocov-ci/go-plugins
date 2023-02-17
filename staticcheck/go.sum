@@ -1,6 +1,4 @@
 github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLju8=
-github.com/cocov-ci/go-plugin-kit v0.1.11 h1:+56rEQQkVtLmKf934s9ovvnZs465Lnp0XOfWEDoMKqw=
-github.com/cocov-ci/go-plugin-kit v0.1.11/go.mod h1:O4u72ld2lo3ceRA7jiPty1fWIVnnlvzCnLwZNIpIxhc=
 github.com/cocov-ci/go-plugin-kit v0.1.12 h1:brMhZq7ELkh1TVJ4Hlm8yNgsisqvokhBr6mo96p5rag=
 github.com/cocov-ci/go-plugin-kit v0.1.12/go.mod h1:O4u72ld2lo3ceRA7jiPty1fWIVnnlvzCnLwZNIpIxhc=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
