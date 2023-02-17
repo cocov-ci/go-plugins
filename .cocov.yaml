@@ -21,3 +21,7 @@ checks:
     mounts:
       - source: secrets:GIT_CONFIG
         destination: ~/.gitconfig
+
+  - plugin: cocov/semgrep:v0.1
+    envs:
+      GOPRIVATE: github.com/cocov-ci
