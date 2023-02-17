@@ -31,7 +31,7 @@ for plugin in "${plugins[@]}"; do
     go tool cover -html="$OUT" -o "$HTML"
     rm "$OUT"
   else
-    go test ./...
+    go test ./... -covermode=count -coverprofile="c.out"
   fi
   cd ..
 done
