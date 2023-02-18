@@ -3,6 +3,7 @@ package common
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/cocov-ci/go-plugin-kit/cocov"
@@ -60,7 +61,9 @@ func GoModDownload(path string, log *zap.Logger) error {
 // that returns the path to a parent directory based on the actual path.
 // It also stops the execution if the target path can not be found.
 func FindParentDir(t *testing.T, actual, target string) string {
-	require.NotEqual(t, actual, "")
+	ok := strings.Contains(actual, target)
+	require.Truef(t, ok,
+		"Fails if the actual path does not contain the target directory\nCurrent: %s\nTarget: %s", actual, target)
 
 	if filepath.Base(actual) == target {
 		return actual
