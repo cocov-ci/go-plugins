@@ -13,15 +13,12 @@ import (
 )
 
 func TestRun(t *testing.T) {
-	wd, err := os.Getwd()
-	require.NoError(t, err)
-
-	parent := common.FindParentDir(t, wd, "go-plugins")
+	root := common.FindParentDir(t)
 
 	ctrl := gomock.NewController(t)
 	ctx := sdkmocks.NewMockContext(ctrl)
 
-	ctx.EXPECT().Workdir().Return(parent)
+	ctx.EXPECT().Workdir().Return(root)
 	l := zap.NewNop()
 
 	issues, err := run(ctx, l)

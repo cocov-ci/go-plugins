@@ -14,20 +14,17 @@ import (
 )
 
 func TestRun(t *testing.T) {
-	wd, err := os.Getwd()
-	require.NoError(t, err)
-
-	parent := common.FindParentDir(t, wd, "go-plugins")
+	root := common.FindParentDir(t)
 	l := zap.NewNop()
 	tomlFileName := "revive.toml"
 
 	t.Run("fails with malformed toml", func(t *testing.T) {
-		tomlPath := filepath.Join(parent, "revive", "fixtures", "malformed.toml")
+		tomlPath := filepath.Join(root, "revive", "fixtures", "malformed.toml")
 
 		data, err := os.ReadFile(tomlPath)
 		require.NoError(t, err)
 
-		localTomlPath := filepath.Join(parent, "revive", "revive.toml")
+		localTomlPath := filepath.Join(root, "revive", "revive.toml")
 		f, err := os.OpenFile(localTomlPath, os.O_RDWR|os.O_CREATE, 0666)
 		require.NoError(t, err)
 		defer f.Close()
@@ -39,7 +36,7 @@ func TestRun(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		ctx := sdkmocks.NewMockContext(ctrl)
-		ctx.EXPECT().Workdir().Return(parent).MaxTimes(2)
+		ctx.EXPECT().Workdir().Return(root).MaxTimes(2)
 
 		_, err = run(ctx, l)
 		assert.Error(t, err)
@@ -48,7 +45,7 @@ func TestRun(t *testing.T) {
 	t.Run("without toml", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		ctx := sdkmocks.NewMockContext(ctrl)
-		ctx.EXPECT().Workdir().Return(parent).MaxTimes(2)
+		ctx.EXPECT().Workdir().Return(root).MaxTimes(2)
 
 		issues, err := run(ctx, l)
 		require.NoError(t, err)
@@ -61,12 +58,12 @@ func TestRun(t *testing.T) {
 	})
 
 	t.Run("with root toml", func(t *testing.T) {
-		tomlPath := filepath.Join(parent, "revive", "fixtures", tomlFileName)
+		tomlPath := filepath.Join(root, "revive", "fixtures", tomlFileName)
 
 		data, err := os.ReadFile(tomlPath)
 		require.NoError(t, err)
 
-		parentTomlPath := filepath.Join(parent, "revive.toml")
+		parentTomlPath := filepath.Join(root, "revive.toml")
 		f, err := os.OpenFile(parentTomlPath, os.O_RDWR|os.O_CREATE, 0666)
 		require.NoError(t, err)
 		defer f.Close()
@@ -78,7 +75,7 @@ func TestRun(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		ctx := sdkmocks.NewMockContext(ctrl)
-		ctx.EXPECT().Workdir().Return(parent).MaxTimes(2)
+		ctx.EXPECT().Workdir().Return(root).MaxTimes(2)
 
 		issues, err := run(ctx, l)
 		assert.NoError(t, err)
@@ -91,12 +88,12 @@ func TestRun(t *testing.T) {
 	})
 
 	t.Run("with local toml", func(t *testing.T) {
-		tomlPath := filepath.Join(parent, "revive", "fixtures", tomlFileName)
+		tomlPath := filepath.Join(root, "revive", "fixtures", tomlFileName)
 
 		data, err := os.ReadFile(tomlPath)
 		require.NoError(t, err)
 
-		localTomlPath := filepath.Join(parent, "revive", "revive.toml")
+		localTomlPath := filepath.Join(root, "revive", "revive.toml")
 		f, err := os.OpenFile(localTomlPath, os.O_RDWR|os.O_CREATE, 0666)
 		require.NoError(t, err)
 		defer f.Close()
@@ -108,7 +105,7 @@ func TestRun(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		ctx := sdkmocks.NewMockContext(ctrl)
-		ctx.EXPECT().Workdir().Return(parent).MaxTimes(2)
+		ctx.EXPECT().Workdir().Return(root).MaxTimes(2)
 
 		issues, err := run(ctx, l)
 		assert.NoError(t, err)
@@ -122,11 +119,8 @@ func TestRun(t *testing.T) {
 }
 
 func TestReviveTomlExists(t *testing.T) {
-	wd, err := os.Getwd()
-	require.NoError(t, err)
-
-	parent := common.FindParentDir(t, wd, "go-plugins")
-	fixtureTomlPath := filepath.Join(parent, "revive/fixtures")
+	root := common.FindParentDir(t)
+	fixtureTomlPath := filepath.Join(root, "revive/fixtures")
 	_, ok, err := reviveTomlExists(zap.NewNop(), fixtureTomlPath)
 	require.NoError(t, err)
 	assert.True(t, ok)

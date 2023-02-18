@@ -14,10 +14,7 @@ import (
 
 // TestRun assumes that the runner has golangci-lint installed.
 func TestRun(t *testing.T) {
-	wd, err := os.Getwd()
-	require.NoError(t, err)
-
-	parent := common.FindParentDir(t, wd, "go-plugins")
+	root := common.FindParentDir(t)
 	l := zap.NewNop()
 
 	t.Run("Works as expected", func(t *testing.T) {
@@ -25,13 +22,13 @@ func TestRun(t *testing.T) {
 		ctx := sdkmocks.NewMockContext(ctrl)
 
 		fixtureYamlPath := filepath.
-			Join(parent, "golangci-lint", "fixtures", "fixture-file.yaml")
+			Join(root, "golangci-lint", "fixtures", "fixture-file.yaml")
 
 		data, err := os.ReadFile(fixtureYamlPath)
 		require.NoError(t, err)
 
 		targetFilePath := filepath.
-			Join(parent, "golangci-lint", ".golangci.yaml")
+			Join(root, "golangci-lint", ".golangci.yaml")
 
 		file, err := os.OpenFile(targetFilePath, os.O_RDWR|os.O_CREATE, os.ModePerm)
 		require.NoError(t, err)
@@ -42,7 +39,7 @@ func TestRun(t *testing.T) {
 		defer file.Close()
 		defer os.Remove(targetFilePath)
 
-		ctx.EXPECT().Workdir().Return(parent)
+		ctx.EXPECT().Workdir().Return(root)
 
 		issues, err := run(ctx, l)
 		require.NoError(t, err)
