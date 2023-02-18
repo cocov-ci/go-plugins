@@ -43,7 +43,7 @@ jobs:
           script/test
 
       - name: Push coverage report
-        run: ./.coverage-reporter submit
+        run: ./.coverage-reporter submit --multi
 
   build:
     if: github.ref == 'refs/heads/master'
