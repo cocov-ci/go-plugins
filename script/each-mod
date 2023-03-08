@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+plugins=(
+  "golangci-lint"
+  "revive"
+  "staticcheck"
+)
+
+for plugin in "${plugins[@]}"; do
+  pushd . > /dev/null || exit 1
+  echo "Updating dependencies of: $plugin"
+  cd "$plugin"
+    go get -u ./...
+    go mod tidy
+  cd ..
+done
