@@ -22,7 +22,7 @@ COPY --from=builder /app/main /bin/plugin-golangci-lint
 RUN apk --no-cache add git gcc musl-dev
 RUN apk --no-cache add --virtual deps curl
 
-RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.50.1
+RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh
 
 RUN apk del deps
 
