@@ -1,7 +1,6 @@
 package common
 
 import (
-	"os"
 	"strings"
 	"testing"
 
@@ -12,32 +11,18 @@ import (
 
 // EmitIssues emits one report for each provided issue. Logs and returns
 // the error if it fails.
-func EmitIssues(ctx cocov.Context, log *zap.Logger, issues []*CocovIssue) error {
+func EmitIssues(ctx cocov.Context, issues []*CocovIssue) error {
 	for _, issue := range issues {
 		err := ctx.EmitIssue(
 			issue.Kind, issue.FilePath, issue.LineStart,
 			issue.LineEnd, issue.Message, issue.UID)
 
 		if err != nil {
-			log.Error("Error issuing cocov report", zap.Error(err))
+			ctx.Logger().Error("Error issuing cocov report", zap.Error(err))
 			return err
 		}
 	}
 	return nil
-}
-
-// SetupLogger configures a logger based on COCOV_ENV environment variable and
-// returns a logger named with the pluginName or an error if it fails.
-func SetupLogger(pluginName string) (*zap.Logger, error) {
-	l, err := zap.NewProduction()
-	if os.Getenv("COCOV_ENV") == "development" {
-		opts := zap.Development()
-		l, err = zap.NewDevelopment(opts)
-	}
-	if err != nil {
-		return nil, err
-	}
-	return l.With(zap.String("plugin", pluginName)), nil
 }
 
 // GoModDownload runs the command `go mod download` at a given path.

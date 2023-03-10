@@ -14,14 +14,20 @@ import (
 
 func TestRun(t *testing.T) {
 	root := common.FindParentDir(t)
+	sha := "sha"
 
 	ctrl := gomock.NewController(t)
 	ctx := sdkmocks.NewMockContext(ctrl)
 
-	ctx.EXPECT().Workdir().Return(root)
 	l := zap.NewNop()
+	ctx.EXPECT().Workdir().Return(root)
+	ctx.EXPECT().L().
+		DoAndReturn(func() *zap.Logger { return l }).
+		AnyTimes()
 
-	issues, err := run(ctx, l)
+	ctx.EXPECT().CommitSHA().Return(sha).AnyTimes()
+
+	issues, err := run(ctx)
 	require.NoError(t, err)
 
 	for _, i := range issues {
@@ -30,5 +36,4 @@ func TestRun(t *testing.T) {
 		require.NoError(t, err)
 		require.False(t, f.IsDir())
 	}
-
 }

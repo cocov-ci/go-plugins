@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"encoding/json"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -12,30 +11,24 @@ import (
 )
 
 func Run(ctx cocov.Context) error {
-	logger, err := common.SetupLogger("revive")
-	if err != nil {
-		log.Printf("Error configuring logger: %s", err)
-		return err
-	}
-
-	issues, err := run(ctx, logger)
+	issues, err := run(ctx)
 	if err != nil {
 		return err
 	}
 
-	return common.EmitIssues(ctx, logger, issues)
+	return common.EmitIssues(ctx, issues)
 }
 
-func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
+func run(ctx cocov.Context) ([]*common.CocovIssue, error) {
 	modPaths, err := cocov.FindGoModules(ctx.Workdir())
 	if err != nil {
-		logger.Error("Error searching for go modules",
+		ctx.L().Error("Error searching for go modules",
 			zap.String("path", ctx.Workdir()),
 			zap.Error(err))
 		return nil, err
 	}
 
-	rootToml, rootTomlExists, err := reviveTomlExists(logger, ctx.Workdir())
+	rootToml, rootTomlExists, err := reviveTomlExists(ctx.L(), ctx.Workdir())
 	if err != nil {
 		return nil, err
 	}
@@ -43,11 +36,11 @@ func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
 	var issues []*common.CocovIssue
 	for _, modPath := range modPaths {
 		modDir := filepath.Dir(modPath)
-		if err = common.GoModDownload(modDir, logger); err != nil {
+		if err = common.GoModDownload(modDir, ctx.L()); err != nil {
 			return nil, err
 		}
 
-		modToml, modTomlExists, err := reviveTomlExists(logger, modDir)
+		modToml, modTomlExists, err := reviveTomlExists(ctx.L(), modDir)
 		if err != nil {
 			return nil, err
 		}
@@ -64,11 +57,11 @@ func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
 			args = []string{"-formatter", "json"}
 		}
 
-		stdOut, stdErr, err := cocov.
-			Exec2("revive", args, &cocov.ExecOpts{Workdir: modDir})
+		opts := &cocov.ExecOpts{Workdir: modDir}
+		stdOut, stdErr, err := cocov.Exec2("revive", args, opts)
 
 		if err != nil {
-			logger.Error("Error running revive",
+			ctx.L().Error("Error running revive",
 				zap.String("module path", modDir),
 				zap.String("stdOut: ", string(stdOut)),
 				zap.String("stdErr: ", string(stdErr)),
@@ -79,7 +72,7 @@ func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
 
 		var modRules []rule
 		if err := json.Unmarshal(stdOut, &modRules); err != nil {
-			logger.Error("Error unmarshalling revive output",
+			ctx.L().Error("Error unmarshalling revive output",
 				zap.String("output: ", string(stdOut)),
 				zap.Error(err))
 			return nil, err
@@ -93,7 +86,10 @@ func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
 
 			filePath := filepath.Join(modDir, r.fileName())
 			issue := common.NewCocovIssue(
-				kind, r.startLine(), r.endLine(), filePath, r.text())
+				kind, r.startLine(),
+				r.endLine(), filePath, r.text(),
+				ctx.CommitSHA(),
+			)
 
 			issues = append(issues, issue)
 		}

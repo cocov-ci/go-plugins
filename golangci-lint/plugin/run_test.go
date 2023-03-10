@@ -15,11 +15,17 @@ import (
 // TestRun assumes that the runner has golangci-lint installed.
 func TestRun(t *testing.T) {
 	root := common.FindParentDir(t)
-	l := zap.NewNop()
+	sha := "sha"
 
 	t.Run("Works as expected", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		ctx := sdkmocks.NewMockContext(ctrl)
+		l := zap.NewNop()
+		ctx.EXPECT().L().
+			DoAndReturn(func() *zap.Logger { return l }).
+			AnyTimes()
+
+		ctx.EXPECT().CommitSHA().Return(sha).AnyTimes()
 
 		fixtureYamlPath := filepath.
 			Join(root, "golangci-lint", "fixtures", "fixture-file.yaml")
@@ -41,7 +47,7 @@ func TestRun(t *testing.T) {
 
 		ctx.EXPECT().Workdir().Return(root)
 
-		issues, err := run(ctx, l)
+		issues, err := run(ctx)
 		require.NoError(t, err)
 
 		for _, issue := range issues {

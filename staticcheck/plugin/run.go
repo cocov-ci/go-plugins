@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"encoding/json"
-	"log"
 	"os/exec"
 	"path/filepath"
 
@@ -12,24 +11,18 @@ import (
 )
 
 func Run(ctx cocov.Context) error {
-	logger, err := common.SetupLogger("golangci-lint")
-	if err != nil {
-		log.Printf("Error configuring logger")
-		return err
-	}
-
-	issues, err := run(ctx, logger)
+	issues, err := run(ctx)
 	if err != nil {
 		return err
 	}
 
-	return common.EmitIssues(ctx, logger, issues)
+	return common.EmitIssues(ctx, issues)
 }
 
-func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
+func run(ctx cocov.Context) ([]*common.CocovIssue, error) {
 	modPaths, err := cocov.FindGoModules(ctx.Workdir())
 	if err != nil {
-		logger.Error("Error searching for go modules",
+		ctx.L().Error("Error searching for go modules",
 			zap.String("path", ctx.Workdir()),
 			zap.Error(err))
 		return nil, err
@@ -43,7 +36,7 @@ func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
 		stdOut, stdErr, err := cocov.Exec2("staticcheck", []string{"-f", "json", "./..."}, opts)
 		if err != nil {
 			if expectedErr, ok := err.(*exec.ExitError); !ok || expectedErr.ExitCode() != 1 {
-				logger.Error("Error running staticcheck",
+				ctx.L().Error("Error running staticcheck",
 					zap.String("path", modDir),
 					zap.String("Std Err", string(stdErr)),
 					zap.Error(err))
@@ -51,9 +44,9 @@ func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
 			}
 		}
 
-		modIssues, err := parseChecks(stdOut)
+		modIssues, err := parseChecks(stdOut, ctx.CommitSHA())
 		if err != nil {
-			logger.Error("Error parsing checks",
+			ctx.L().Error("Error parsing checks",
 				zap.String("module path", modDir),
 				zap.Error(err))
 			return nil, err
@@ -64,7 +57,7 @@ func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
 	return issues, nil
 }
 
-func parseChecks(stdOut []byte) ([]*common.CocovIssue, error) {
+func parseChecks(stdOut []byte, commitSha string) ([]*common.CocovIssue, error) {
 	var issues []*common.CocovIssue //nolint:prealloc
 	var buff []byte
 	for _, b := range stdOut {
@@ -86,7 +79,11 @@ func parseChecks(stdOut []byte) ([]*common.CocovIssue, error) {
 			continue
 		}
 
-		issue := common.NewCocovIssue(kind, c.Location.Line, c.End.Line, c.Location.File, c.Message)
+		issue := common.NewCocovIssue(
+			kind, c.Location.Line, c.End.Line,
+			c.Location.File, c.Message, commitSha,
+		)
+
 		issues = append(issues, issue)
 	}
 

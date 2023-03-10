@@ -2,7 +2,6 @@ package plugin
 
 import (
 	"encoding/json"
-	"log"
 	"os/exec"
 	"path/filepath"
 
@@ -12,24 +11,18 @@ import (
 )
 
 func Run(ctx cocov.Context) error {
-	logger, err := common.SetupLogger("golangci-lint")
-	if err != nil {
-		log.Printf("Error configuring logger")
-		return err
-	}
-
-	issues, err := run(ctx, logger)
+	issues, err := run(ctx)
 	if err != nil {
 		return err
 	}
 
-	return common.EmitIssues(ctx, logger, issues)
+	return common.EmitIssues(ctx, issues)
 }
 
-func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
+func run(ctx cocov.Context) ([]*common.CocovIssue, error) {
 	modPaths, err := cocov.FindGoModules(ctx.Workdir())
 	if err != nil {
-		logger.Error(
+		ctx.L().Error(
 			"Error searching for go modules",
 			zap.String("path", ctx.Workdir()),
 			zap.Error(err),
@@ -40,13 +33,13 @@ func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
 	var repoIssues []*common.CocovIssue
 	for _, modPath := range modPaths {
 		modDir := filepath.Dir(modPath)
-		logger.Info("Working", zap.String("at", modDir))
+		ctx.L().Info("Working", zap.String("at", modDir))
 
-		if err = common.GoModDownload(modDir, logger); err != nil {
+		if err = common.GoModDownload(modDir, ctx.L()); err != nil {
 			return nil, err
 		}
 
-		output, err := runGolangCILint(modDir, logger)
+		output, err := runGolangCILint(modDir, ctx.L())
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +48,7 @@ func run(ctx cocov.Context, logger *zap.Logger) ([]*common.CocovIssue, error) {
 			continue
 		}
 
-		modIssues := buildCocovIssues(modDir, output)
+		modIssues := buildCocovIssues(modDir, ctx.CommitSHA(), output)
 		repoIssues = append(repoIssues, modIssues...)
 	}
 	return repoIssues, nil
@@ -93,7 +86,7 @@ func runGolangCILint(path string, log *zap.Logger) (*goCILintOutput, error) {
 	return out, nil
 }
 
-func buildCocovIssues(path string, out *goCILintOutput) []*common.CocovIssue {
+func buildCocovIssues(path, commitSha string, out *goCILintOutput) []*common.CocovIssue {
 	ccIssues := make([]*common.CocovIssue, 0, len(out.Issues))
 	for _, issue := range out.Issues {
 		kind, ok := linters[issue.FromLinter]
@@ -101,7 +94,7 @@ func buildCocovIssues(path string, out *goCILintOutput) []*common.CocovIssue {
 			continue
 		}
 
-		i, ok := newCocovIssue(path, issue, kind)
+		i, ok := newCocovIssue(path, commitSha, issue, kind)
 		if !ok {
 			continue
 		}
