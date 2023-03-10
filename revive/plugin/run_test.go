@@ -17,6 +17,7 @@ func TestRun(t *testing.T) {
 	root := common.FindParentDir(t)
 	l := zap.NewNop()
 	tomlFileName := "revive.toml"
+	sha := "sha"
 
 	t.Run("fails with malformed toml", func(t *testing.T) {
 		tomlPath := filepath.Join(root, "revive", "fixtures", "malformed.toml")
@@ -37,8 +38,12 @@ func TestRun(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		ctx := sdkmocks.NewMockContext(ctrl)
 		ctx.EXPECT().Workdir().Return(root).MaxTimes(2)
+		ctx.EXPECT().L().
+			DoAndReturn(func() *zap.Logger { return l }).
+			AnyTimes()
+		ctx.EXPECT().CommitSHA().Return(sha).AnyTimes()
 
-		_, err = run(ctx, l)
+		_, err = run(ctx)
 		assert.Error(t, err)
 	})
 
@@ -46,8 +51,12 @@ func TestRun(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		ctx := sdkmocks.NewMockContext(ctrl)
 		ctx.EXPECT().Workdir().Return(root).MaxTimes(2)
+		ctx.EXPECT().L().
+			DoAndReturn(func() *zap.Logger { return l }).
+			AnyTimes()
+		ctx.EXPECT().CommitSHA().Return(sha).AnyTimes()
 
-		issues, err := run(ctx, l)
+		issues, err := run(ctx)
 		require.NoError(t, err)
 
 		for _, issue := range issues {
@@ -76,8 +85,12 @@ func TestRun(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		ctx := sdkmocks.NewMockContext(ctrl)
 		ctx.EXPECT().Workdir().Return(root).MaxTimes(2)
+		ctx.EXPECT().L().
+			DoAndReturn(func() *zap.Logger { return l }).
+			AnyTimes()
+		ctx.EXPECT().CommitSHA().Return(sha).AnyTimes()
 
-		issues, err := run(ctx, l)
+		issues, err := run(ctx)
 		assert.NoError(t, err)
 
 		for _, issue := range issues {
@@ -106,8 +119,12 @@ func TestRun(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		ctx := sdkmocks.NewMockContext(ctrl)
 		ctx.EXPECT().Workdir().Return(root).MaxTimes(2)
+		ctx.EXPECT().L().
+			DoAndReturn(func() *zap.Logger { return l }).
+			AnyTimes()
+		ctx.EXPECT().CommitSHA().Return(sha).AnyTimes()
 
-		issues, err := run(ctx, l)
+		issues, err := run(ctx)
 		assert.NoError(t, err)
 
 		for _, issue := range issues {

@@ -18,7 +18,7 @@ type CocovIssue struct {
 func NewCocovIssue(
 	kind cocov.IssueKind,
 	lineStart, lineEnd uint,
-	filePath, message string) *CocovIssue {
+	filePath, message, commitSha string) *CocovIssue {
 	c := &CocovIssue{
 		Kind:      kind,
 		FilePath:  filePath,
@@ -26,12 +26,13 @@ func NewCocovIssue(
 		LineEnd:   lineEnd,
 		Message:   message,
 	}
-	c.hashID()
+	c.hashID(commitSha)
 	return c
 }
 
-func (c *CocovIssue) hashID() {
-	input := fmt.Sprintf("%s-%s-%s", c.Kind,
-		fmt.Sprintf("%d", c.LineStart), c.FilePath)
+func (c *CocovIssue) hashID(commitSha string) {
+	input := fmt.Sprintf("%s-%s-%s-%s",
+		commitSha, c.Kind, fmt.Sprintf("%d", c.LineStart), c.FilePath,
+	)
 	c.UID = cocov.SHA1([]byte(input))
 }
