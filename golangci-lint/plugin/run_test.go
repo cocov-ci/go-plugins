@@ -27,6 +27,12 @@ func TestRun(t *testing.T) {
 
 		ctx.EXPECT().CommitSHA().Return(sha).AnyTimes()
 
+		ctx.EXPECT().LoadArtifactCache(gomock.Any(), gomock.Any()).
+			Return(true, nil).AnyTimes()
+
+		ctx.EXPECT().StoreArtifactCache(gomock.Any(), gomock.Any()).
+			Return(nil).AnyTimes()
+
 		fixtureYamlPath := filepath.
 			Join(root, "golangci-lint", "fixtures", "fixture-file.yaml")
 

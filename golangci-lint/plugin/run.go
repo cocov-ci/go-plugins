@@ -2,6 +2,7 @@ package plugin
 
 import (
 	"encoding/json"
+	"os"
 	"os/exec"
 	"path/filepath"
 
@@ -33,13 +34,36 @@ func run(ctx cocov.Context) ([]*common.CocovIssue, error) {
 	var repoIssues []*common.CocovIssue
 	for _, modPath := range modPaths {
 		modDir := filepath.Dir(modPath)
-		ctx.L().Info("Working", zap.String("at", modDir))
+		sumPath := filepath.Join(modDir, "go.sum")
 
-		if err = common.GoModDownload(modDir, ctx.L()); err != nil {
+		cachePath, err := os.MkdirTemp("", "")
+		if err != nil {
+			panic(err)
+		}
+
+		goEnv := map[string]string{
+			"GOMODCACHE": cachePath,
+		}
+
+		keys := []string{modPath, sumPath}
+		if _, err = ctx.LoadArtifactCache(keys, cachePath); err != nil {
+			ctx.L().Error("Error loading cache artifact", zap.Error(err))
 			return nil, err
 		}
 
-		output, err := runGolangCILint(modDir, ctx.L())
+		ctx.L().Info("Working", zap.String("at", modDir))
+
+		if err = common.GoModDownload(modDir, ctx.L(), goEnv); err != nil {
+			return nil, err
+		}
+
+		// bad file
+		if err = ctx.StoreArtifactCache(keys, cachePath); err != nil {
+			ctx.L().Error("Error storing cache artifact", zap.Error(err))
+			return nil, err
+		}
+
+		output, err := runGolangCILint(modDir, ctx.L(), goEnv)
 		if err != nil {
 			return nil, err
 		}
@@ -54,10 +78,10 @@ func run(ctx cocov.Context) ([]*common.CocovIssue, error) {
 	return repoIssues, nil
 }
 
-func runGolangCILint(path string, log *zap.Logger) (*goCILintOutput, error) {
+func runGolangCILint(path string, log *zap.Logger, env map[string]string) (*goCILintOutput, error) {
 	args := []string{"run", "--out-format", "json"}
 	stdOut, stdErr, err := cocov.
-		Exec2("golangci-lint", args, &cocov.ExecOpts{Workdir: path})
+		Exec2("golangci-lint", args, &cocov.ExecOpts{Workdir: path, Env: env})
 
 	if err != nil {
 		if !isGolangCILintExpectedErr(err) {
