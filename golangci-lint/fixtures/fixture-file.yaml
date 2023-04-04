@@ -130,7 +130,6 @@ linters-settings:
       - importshadow
       - indexalloc
       - initclause
-      - ioutildeprecated
       - mapkey
       - methodexprcall
       - nestingreduce
