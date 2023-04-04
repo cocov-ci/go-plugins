@@ -37,11 +37,20 @@ func TestRun(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		ctx := sdkmocks.NewMockContext(ctrl)
+
 		ctx.EXPECT().Workdir().Return(root).MaxTimes(2)
+
 		ctx.EXPECT().L().
 			DoAndReturn(func() *zap.Logger { return l }).
 			AnyTimes()
+
 		ctx.EXPECT().CommitSHA().Return(sha).AnyTimes()
+
+		ctx.EXPECT().LoadArtifactCache(gomock.Any(), gomock.Any()).
+			Return(true, nil).AnyTimes()
+
+		ctx.EXPECT().StoreArtifactCache(gomock.Any(), gomock.Any()).
+			Return(nil).AnyTimes()
 
 		_, err = run(ctx)
 		assert.Error(t, err)
@@ -50,11 +59,20 @@ func TestRun(t *testing.T) {
 	t.Run("without toml", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		ctx := sdkmocks.NewMockContext(ctrl)
+
 		ctx.EXPECT().Workdir().Return(root).MaxTimes(2)
+
 		ctx.EXPECT().L().
 			DoAndReturn(func() *zap.Logger { return l }).
 			AnyTimes()
+
 		ctx.EXPECT().CommitSHA().Return(sha).AnyTimes()
+
+		ctx.EXPECT().LoadArtifactCache(gomock.Any(), gomock.Any()).
+			Return(true, nil).AnyTimes()
+
+		ctx.EXPECT().StoreArtifactCache(gomock.Any(), gomock.Any()).
+			Return(nil).AnyTimes()
 
 		issues, err := run(ctx)
 		require.NoError(t, err)
@@ -85,10 +103,18 @@ func TestRun(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		ctx := sdkmocks.NewMockContext(ctrl)
 		ctx.EXPECT().Workdir().Return(root).MaxTimes(2)
+
 		ctx.EXPECT().L().
 			DoAndReturn(func() *zap.Logger { return l }).
 			AnyTimes()
+
 		ctx.EXPECT().CommitSHA().Return(sha).AnyTimes()
+
+		ctx.EXPECT().LoadArtifactCache(gomock.Any(), gomock.Any()).
+			Return(true, nil).AnyTimes()
+
+		ctx.EXPECT().StoreArtifactCache(gomock.Any(), gomock.Any()).
+			Return(nil).AnyTimes()
 
 		issues, err := run(ctx)
 		assert.NoError(t, err)
@@ -118,11 +144,20 @@ func TestRun(t *testing.T) {
 
 		ctrl := gomock.NewController(t)
 		ctx := sdkmocks.NewMockContext(ctrl)
+
 		ctx.EXPECT().Workdir().Return(root).MaxTimes(2)
+
 		ctx.EXPECT().L().
 			DoAndReturn(func() *zap.Logger { return l }).
 			AnyTimes()
+
 		ctx.EXPECT().CommitSHA().Return(sha).AnyTimes()
+
+		ctx.EXPECT().LoadArtifactCache(gomock.Any(), gomock.Any()).
+			Return(true, nil).AnyTimes()
+
+		ctx.EXPECT().StoreArtifactCache(gomock.Any(), gomock.Any()).
+			Return(nil).AnyTimes()
 
 		issues, err := run(ctx)
 		assert.NoError(t, err)

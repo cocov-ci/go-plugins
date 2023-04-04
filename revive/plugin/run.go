@@ -35,8 +35,31 @@ func run(ctx cocov.Context) ([]*common.CocovIssue, error) {
 
 	var issues []*common.CocovIssue
 	for _, modPath := range modPaths {
+
 		modDir := filepath.Dir(modPath)
-		if err = common.GoModDownload(modDir, ctx.L()); err != nil {
+		sumPath := filepath.Join(modDir, "go.sum")
+
+		cachePath, err := os.MkdirTemp("", "")
+		if err != nil {
+			panic(err)
+		}
+
+		goEnv := map[string]string{
+			"GOMODCACHE": cachePath,
+		}
+
+		keys := []string{modPath, sumPath}
+		if _, err = ctx.LoadArtifactCache(keys, cachePath); err != nil {
+			ctx.L().Error("Error loading cache artifact", zap.Error(err))
+			return nil, err
+		}
+
+		if err = common.GoModDownload(modDir, ctx.L(), goEnv); err != nil {
+			return nil, err
+		}
+
+		if err = ctx.StoreArtifactCache(keys, cachePath); err != nil {
+			ctx.L().Error("Error storing cache artifact", zap.Error(err))
 			return nil, err
 		}
 
