@@ -2,12 +2,14 @@
 
 set -e
 
-projects=(golangci-lint revive staticcheck)
-for i in "${projects[@]}"; do
- docker build -f "${i}/Dockerfile" -t "cocov/${i}:$(cat "${i}/VERSION" | head -n 1)" $@ .
-done
+if [[ -z "$1" ]]; then
+  echo "Usage: script/build PROJECTNAME"
+  exit 1
+fi
 
-for i in "${projects[@]}"; do
-  docker push "cocov/${i}:$(cat "${i}/VERSION" | head -n 1)"
-done
+proj="$1"
+shift
+
+docker build -f "${proj}/Dockerfile" -t "cocov/${proj}:$(cat "${proj}/VERSION" | head -n 1)" $@ .
+docker push "cocov/${proj}:$(cat "${proj}/VERSION" | head -n 1)"
 

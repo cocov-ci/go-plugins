@@ -50,6 +50,9 @@ jobs:
     needs: test
 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        plugin: [golangci-lint, revive, staticcheck]
 
     steps:
       - name: Check out to repository
@@ -63,4 +66,4 @@ jobs:
 
       - name: Run script/build
         run: |
-          script/build --build-arg go_token=${{ secrets.GO_SDK_CLONE_TOKEN }}
+          script/build ${{ matrix.plugin }} --build-arg go_token=${{ secrets.GO_SDK_CLONE_TOKEN }}
