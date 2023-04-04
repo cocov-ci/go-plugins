@@ -27,9 +27,9 @@ func EmitIssues(ctx cocov.Context, issues []*CocovIssue) error {
 
 // GoModDownload runs the command `go mod download` at a given path.
 // Logs and returns the error if it fails.
-func GoModDownload(path string, log *zap.Logger) error {
+func GoModDownload(path string, log *zap.Logger, envs map[string]string) error {
 	args := []string{"mod", "download"}
-	out, err := cocov.Exec("go", args, &cocov.ExecOpts{Workdir: path})
+	out, err := cocov.Exec("go", args, &cocov.ExecOpts{Workdir: path, Env: envs})
 
 	if err != nil {
 		log.Error(
